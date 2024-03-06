@@ -17,3 +17,4 @@ pycocotools>=2.0.2
 onnx>=1.13.0
 onnx-simplifier
 av
+pillow
