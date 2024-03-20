@@ -1,42 +1,22 @@
-# Dockerfile for Python script
-FROM python:1.12.2
+# Используем базовый образ Python 3.10.12
+FROM python:latest
 
-# Set the working directory
-WORKDIR /app
+# Устанавливаем необходимые зависимости
+RUN apt-get update && apt-get install -y \
+    git \
+    cmake \
+    build-essential \
+    libgl1-mesa-glx
 
-# Copy the Python script to the container
-COPY main.py /app/main.py
+# Переходим в директорию YOLOX
+WORKDIR /YOLOX
+COPY . .
 
-# Install dependencies
-RUN pip3 install av pillow
+# Устанавливаем зависимости Python
+RUN pip install -r requirements.txt
 
-# Command to run the script
-CMD ["python3", "main.py -i assets/develop_streem.ts -o frame -f 120,130,140"]
+# Собираем YOLOX
+RUN python setup.py develop
 
-# Dockerfile for YOLOX
-FROM python:3.12.2
-
-# Set the working directory
-WORKDIR /app
-
-# Clone the YOLOX repository
-RUN git clone git@github.com:Megvii-BaseDetection/YOLOX.git
-
-# Change to the YOLOX directory
-WORKDIR /app/YOLOX
-
-# Install YOLOX dependencies
-RUN pip3 install -v -e .
-
-# Command to run YOLOX (replace with the actual command to run YOLOX)
-CMD ["python3", "tools/demo.py image -n yolox-s -c weights/yolox_s.pth --path assets/frame_120.jpg --conf 0.25 --nms 0.45 --tsize 640 --save_result --device cpu/gpu
-"]
-
-CMD ["python3", "tools/demo.py image -n yolox-s -c weights/yolox_s.pth --path assets/frame_130.jpg --conf 0.25 --nms 0.45 --tsize 640 --save_result --device cpu/gpu
-"]
-
-CMD ["python3", "tools/demo.py image -n yolox-s -c weights/yolox_s.pth --path assets/frame_140.jpg --conf 0.25 --nms 0.45 --tsize 640 --save_result --device cpu/gpu
-"]
-
-CMD ["python3", "python tools/demo.py video -n yolox-s -c weights/yolox_s.pth --path assets/develop_streem.ts --conf 0.25 --nms 0.45 --tsize 640 --save_result --device cpu/gpu"]
-
+# Указываем команду по умолчанию при запуске контейнера
+CMD ["bash"]
